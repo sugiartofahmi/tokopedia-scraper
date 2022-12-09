@@ -9,6 +9,8 @@
     "dev": "npx nodemon ./src/main.js"
   },
   "dependencies": {
+    "dotenv": "^16.0.3",
+    "env": "^0.0.2",
     "nodemon": "^2.0.20",
     "puppeteer-autoscroll-down": "^1.1.1",
     "puppeteer-core": "^19.2.2"
