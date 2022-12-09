@@ -2,15 +2,14 @@ import puppeteer from "puppeteer-core";
 import fs from "fs";
 const result = { result: [] };
 const app = puppeteer;
-const browser = await app.launch({
-  headless: false,
-  executablePath: process.env.CHROME_BIN,
-  executablePath:
-    "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+const wsChromeEndpointurl =
+  "ws://127.0.0.1:9222/devtools/browser/3c344332-22d2-44c7-87e1-7acd1e14eba1";
+const browser = await app.connect({
+  browserWSEndpoint: wsChromeEndpointurl,
 });
 const page = await browser.newPage();
 await page.goto("https://tokopedia.com");
-await page.type("input[data-unify=Search]", "Durex");
+await page.type("input[data-unify=Search]", "Vortex Vx 5 pro");
 await page.click("button[class='css-1czin5k e1v32nag1']");
 await page.waitForXPath(
   "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[1]/div/div/div/div/div/div[2]/a/div[1])[1]"
@@ -88,11 +87,13 @@ for (let i = 1, data = 1, num = 1; i <= getLength.length; i++, data++) {
   result.result.push(obj);
 }
 console.log(result.result);
-// fs.writeFile("output.json", JSON.stringify(result), "utf8", function (err) {
-//   if (err) {
-//     console.log("An error occured while writing JSON Object to File.");
-//     return console.log(err);
-//   }
+fs.writeFile("output.json", JSON.stringify(result), "utf8", function (err) {
+  if (err) {
+    console.log("An error occured while writing JSON Object to File.");
+    return console.log(err);
+  }
 
-//   console.log("JSON file has been saved.");
-// });
+  console.log("JSON file has been saved.");
+});
+
+browser.close();
