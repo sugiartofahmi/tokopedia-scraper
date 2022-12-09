@@ -10,7 +10,7 @@ const browser = await app.launch({
 });
 const page = await browser.newPage();
 await page.goto("https://tokopedia.com");
-await page.type("input[data-unify=Search]", "Vortex vx 5");
+await page.type("input[data-unify=Search]", "Durex");
 await page.click("button[class='css-1czin5k e1v32nag1']");
 await page.waitForXPath(
   "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[1]/div/div/div/div/div/div[2]/a/div[1])[1]"
@@ -74,8 +74,16 @@ for (let i = 1, data = 1, num = 1; i <= getLength.length; i++, data++) {
     (el) => el.textContent,
     product_name[0]
   );
+  let product_price = await page.$x(
+    `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${num}]/div[${data}]/div/div/div/div/div/div[2]/a/div[2]`
+  );
 
-  let obj = { name: getProduct_name };
+  let getProduct_price = await page.evaluate(
+    (el) => el.textContent,
+    product_price[0]
+  );
+
+  let obj = { name: getProduct_name, price: getProduct_price };
 
   result.result.push(obj);
 }
