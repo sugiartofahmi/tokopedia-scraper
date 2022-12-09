@@ -1,3 +1,4 @@
+//https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
 import puppeteer from "puppeteer-core";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -44,14 +45,6 @@ await page.waitForSelector(
   "#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div.css-gvoll6 > div.css-j8vtlh > div > p.css-17ik9ib"
 );
 
-// let product_name = await page.$x(
-//   `/html/body/div[1]/div/div[2]/div/div[2]/div[4]/div[2]/div[1]/div/div/div/div/div/div[2]/a/div[1]`
-// );
-// let getProduct_name = await page.evaluate(
-//   (el) => el.textContent,
-//   product_name[0]
-// );
-// console.log(getProduct_name);
 const getLength = await page.evaluate(() =>
   Array.from(
     document.querySelectorAll(
