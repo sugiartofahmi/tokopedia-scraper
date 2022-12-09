@@ -1,9 +1,10 @@
 import puppeteer from "puppeteer-core";
+import * as dotenv from "dotenv";
+dotenv.config();
 import fs from "fs";
 const result = { result: [] };
 const app = puppeteer;
-const wsChromeEndpointurl =
-  "ws://127.0.0.1:9222/devtools/browser/3c344332-22d2-44c7-87e1-7acd1e14eba1";
+const wsChromeEndpointurl = process.env.WEB_SOCKET;
 const browser = await app.connect({
   browserWSEndpoint: wsChromeEndpointurl,
 });
