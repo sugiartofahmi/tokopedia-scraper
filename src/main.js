@@ -2,19 +2,28 @@
 import puppeteer from "puppeteer-core";
 import * as dotenv from "dotenv";
 dotenv.config();
-import fs from "fs";
+const unused = [
+  "Terlaris",
+  "Funstation",
+  "Tambah Giftcard!",
+  "Cashback",
+  "Produk Terbaru",
+];
 const result = { result: [] };
+let obj = {};
 const app = puppeteer;
 const wsChromeEndpointurl = process.env.WEB_SOCKET;
 const browser = await app.connect({
   browserWSEndpoint: wsChromeEndpointurl,
 });
 const page = await browser.newPage();
-await page.goto("https://tokopedia.com");
-await page.type("input[data-unify=Search]", "Vortex Vx 5 pro");
-await page.click("button[class='css-1czin5k e1v32nag1']");
+
+await page.goto(
+  `https://www.tokopedia.com/search?navsource=&ob=${process.env.OB}&pmax=200000&pmin=29000&shop_tier=1%233%231%232&q=${process.env.SEARCH_QUERY}&page=1`
+);
+
 await page.waitForXPath(
-  "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[1]/div/div/div/div/div/div[2]/a/div[1])[1]"
+  "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[6])"
 );
 await page.setViewport({
   width: 1200,
@@ -54,40 +63,74 @@ const getLength = await page.evaluate(() =>
   )
 );
 console.log(getLength.length);
-for (let i = 1, data = 1, num = 1; i <= getLength.length; i++, data++) {
-  if (i == 11) {
+for (
+  let i = 10, data = 6, num = 1, pic = 7, counter = 6;
+  i <= getLength.length;
+  i++, data++, pic++, counter++
+) {
+  if (counter == 11) {
     num = 2;
     data = 1;
+    pic = 1;
   }
-  let product_name = await page.$x(
-    `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${num}]/div[${data}]/div/div/div/div/div/div[2]/a/div[1]`
+  let product = await page.$x(
+    `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${num}]/div[${data}]`
   );
 
-  let getProduct_name = await page.evaluate(
-    (el) => el.textContent,
-    product_name[0]
+  let getProduct = await page.evaluate((el) => el.innerText, product[0]);
+  const imgURL = await page.$eval(
+    `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${num}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-1f2quy8 > a > div > img`,
+    (img) => img.src
   );
-  let product_price = await page.$x(
-    `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${num}]/div[${data}]/div/div/div/div/div/div[2]/a/div[2]`
-  );
-
-  let getProduct_price = await page.evaluate(
-    (el) => el.textContent,
-    product_price[0]
-  );
-
-  let obj = { name: getProduct_name, price: getProduct_price };
+  let splitProduct = await getProduct.split("\n");
+  unused.includes(splitProduct[0]) && splitProduct.splice(0, 1);
+  // console.log(splitProduct);
+  splitProduct.length === 8
+    ? (obj = {
+        id: i,
+        image_url: imgURL,
+        name_product: splitProduct[0],
+        price_product: splitProduct[2],
+        name_seller: splitProduct[5],
+        seller_location: splitProduct[4],
+        star_product: splitProduct[6],
+        sold_product: splitProduct[7],
+      })
+    : splitProduct.length === 7
+    ? (obj = {
+        id: i,
+        image_url: imgURL,
+        name_product: splitProduct[0],
+        price_product: splitProduct[1],
+        name_seller: splitProduct[4],
+        seller_location: splitProduct[3],
+        star_product: splitProduct[5],
+        sold_product: splitProduct[6],
+      })
+    : splitProduct.length === 6
+    ? (obj = {
+        id: i,
+        image_url: imgURL,
+        name_product: splitProduct[0],
+        price_product: splitProduct[1],
+        name_seller: splitProduct[3],
+        seller_location: splitProduct[2],
+        star_product: splitProduct[4],
+        sold_product: splitProduct[5],
+      })
+    : splitProduct.length === 5 &&
+      (obj = {
+        id: i,
+        image_url: imgURL,
+        name_product: splitProduct[0],
+        price_product: splitProduct[2],
+        name_seller: splitProduct[4],
+        seller_location: splitProduct[3],
+        star_product: "-",
+        sold_product: "-",
+      });
 
   result.result.push(obj);
 }
 console.log(result.result);
-fs.writeFile("output.json", JSON.stringify(result), "utf8", function (err) {
-  if (err) {
-    console.log("An error occured while writing JSON Object to File.");
-    return console.log(err);
-  }
-
-  console.log("JSON file has been saved.");
-});
-
-browser.close();
+// browser.close();
