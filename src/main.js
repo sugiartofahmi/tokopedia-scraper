@@ -133,4 +133,4 @@ for (
   result.result.push(obj);
 }
 console.log(result.result);
-// browser.close();
+await page.close();
