@@ -1,4 +1,3 @@
-//https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
 import puppeteer from "puppeteer-core";
 import * as dotenv from "dotenv";
 dotenv.config();
