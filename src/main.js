@@ -8,6 +8,9 @@ const unused = [
   "Tambah Giftcard!",
   "Cashback",
   "Produk Terbaru",
+  "MED Harbolnas",
+  "Serbu OS",
+  "Diskon Pengguna Baru",
 ];
 const result = { result: [] };
 let obj = {};
@@ -26,7 +29,7 @@ await page.waitForXPath(
   "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[6])"
 );
 await page.setViewport({
-  width: 1200,
+  width: 1400,
   height: 800,
 });
 
