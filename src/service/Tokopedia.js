@@ -1,0 +1,222 @@
+import { config } from "dotenv";
+import { AutoScroll } from "../utils/AutoScroll.js";
+config();
+import fs from "fs";
+export const Tokopedia = async (page) => {
+  let index = 0;
+  const unused = [
+    "Terlaris",
+    "Funstation",
+    "Tambah Giftcard!",
+    "Cashback",
+    "Produk Terbaru",
+    "MED Harbolnas",
+    "Serbu OS",
+    "Diskon Pengguna Baru",
+    "Ad",
+    "Brand Pilihan",
+  ];
+  const result = [];
+  let obj = {};
+
+  await page.goto(
+    `https://www.tokopedia.com/search?navsource=&ob=${process.env.OB}&pmax=200000&pmin=29000&shop_tier=1%233%231%232&q=${process.env.SEARCH_QUERY}&page=${process.env.PAGE}`
+  );
+
+  await page.waitForXPath(
+    "(//*[@id='zeus-root']/div/div[2]/div/div[2]/div[4]/div[1]/div[6])"
+  );
+  await page.setViewport({
+    width: 1300,
+    height: 800,
+  });
+
+  await AutoScroll(page);
+
+  await page.waitForSelector(
+    "#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div.css-gvoll6 > div.css-j8vtlh > div > p.css-17ik9ib"
+  );
+
+  const getAllCard = await page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll(
+        "#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div.css-jza1fo > div"
+      ),
+      (e) => e.innerHTML
+    )
+  );
+  console.log(getAllCard.length);
+  for (
+    let i = 1, row = 1, data = 6, pic = 7;
+    i <= getAllCard.length - 10;
+    i++, data++, pic++
+  ) {
+    if (i + 5 === 11) {
+      row += 1;
+      data = 1;
+      pic = 1;
+    }
+    const product = await page.$x(
+      `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${row}]/div[${data}]`
+    );
+    const img = await page.$eval(
+      `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${row}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-1f2quy8 > a > div > img`,
+      (img) => img.src
+    );
+    const label = await page.$eval(
+      `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${row}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-974ipl > a > div.css-yaxhi2 > div.css-1ktbh56 > i`,
+      (i) => i.getAttribute("data-testid")
+    );
+    const getProduct = await page.evaluate((el) => el.innerText, product[0]);
+    const getImage = img.replace("200", "500");
+    const getLabel =
+      label === "imgSRPProdTabShopBadgeOSNonTopAds"
+        ? "Official Store"
+        : label === "imgSRPProdTabShopBadgePMProNonTopAds"
+        ? "Power Merchant Pro"
+        : label === "imgSRPProdTabShopBadgeNonTopAds" && "Power Merchant";
+
+    const splitProduct = await getProduct.split("\n");
+    if (unused.includes(splitProduct[0])) {
+      splitProduct.splice(0, 1);
+    }
+    if (unused.includes(splitProduct[1])) {
+      splitProduct.splice(1, 1);
+    }
+    if (unused.includes(splitProduct[2])) {
+      splitProduct.splice(2, 1);
+    }
+    if (unused.includes(splitProduct[3])) {
+      splitProduct.splice(3, 1);
+    }
+    if (unused.includes(splitProduct[4])) {
+      splitProduct.splice(4, 1);
+    }
+    if (splitProduct[2].endsWith("%")) {
+      splitProduct.splice(2, 2);
+    }
+    if (splitProduct[1].startsWith("Rp") && splitProduct[1].endsWith("pcs")) {
+      splitProduct.splice(1, 1);
+    }
+    if (splitProduct[0].startsWith("Sisa")) {
+      splitProduct.splice(0, 1);
+    }
+
+    console.log(splitProduct);
+    console.log(splitProduct.length);
+
+    result.push(obj);
+  }
+  // console.log(result);
+  // await page.close();
+};
+
+// for (
+//   let x = 10, data = 6, num = 1, pic = 7, counter = 6;
+//   x <= getCard.length;
+//   x++, data++, pic++, counter++
+// ) {
+//   if (counter == 11) {
+//     num = 2;
+//     data = 1;
+//     pic = 1;
+//   }
+//   let product = await page.$x(
+//     `//*[@id="zeus-root"]/div/div[2]/div/div[2]/div[4]/div[${num}]/div[${data}]`
+//   );
+
+//   let getProduct = await page.evaluate((el) => el.innerText, product[0]);
+//   const img = await page.$eval(
+//     `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${num}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-1f2quy8 > a > div > img`,
+//     (img) => img.src
+//   );
+
+//   let label = await page.$eval(
+//     `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${num}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-974ipl > a > div.css-yaxhi2 > div.css-1ktbh56 > i`,
+//     (i) => i.getAttribute("data-testid")
+//   );
+//   const getLabel =
+//     label === "imgSRPProdTabShopBadgeOSNonTopAds"
+//       ? "Official Store"
+//       : label === "imgSRPProdTabShopBadgePMProNonTopAds"
+//       ? "Power Merchant Pro"
+//       : label === "imgSRPProdTabShopBadgeNonTopAds"
+//       ? "Power Merchant"
+//       : "";
+
+//   const imgURL = img.replace("200", "500");
+//   let splitProduct = await getProduct.split("\n");
+//   unused.includes(splitProduct[0])
+//     ? splitProduct.splice(0, 1)
+//     : unused.includes(splitProduct[2])
+//     ? splitProduct.splice(2, 1)
+//     : unused.includes(splitProduct[3])
+//     ? splitProduct.splice(3, 1)
+//     : unused.includes(splitProduct[1]) && splitProduct.splice(1, 1);
+
+//   const checkPersent = splitProduct[2].split("");
+//   const checkPcs = splitProduct[1].split("/");
+//   checkPcs.map((x) => x.includes("pcs")) && splitProduct.splice(1, 1);
+//   checkPersent.includes("%") && splitProduct.splice(2, 1);
+//   console.log(splitProduct);
+
+//   splitProduct.length === 8
+//     ? (obj = {
+//         id: x,
+//         image_url: imgURL,
+//         name_product: splitProduct[0],
+//         price_product: splitProduct[2],
+//         name_seller: splitProduct[5],
+//         seller_type: getLabel,
+//         seller_location: splitProduct[4],
+//         star_product: splitProduct[6],
+//         sold_product: splitProduct[7],
+//       })
+//     : splitProduct.length === 7
+//     ? (obj = {
+//         id: x,
+//         image_url: imgURL,
+//         name_product: splitProduct[0],
+//         price_product: splitProduct[1],
+//         name_seller: splitProduct[4],
+//         seller_type: getLabel,
+//         seller_location: splitProduct[3],
+//         star_product: splitProduct[5],
+//         sold_product: splitProduct[6],
+//       })
+//     : splitProduct.length === 6
+//     ? (obj = {
+//         id: x,
+//         image_url: imgURL,
+//         name_product: splitProduct[0],
+//         price_product: splitProduct[1],
+//         name_seller: splitProduct[3],
+//         seller_type: getLabel,
+//         seller_location: splitProduct[2],
+//         star_product: splitProduct[4],
+//         sold_product: splitProduct[5],
+//       })
+//     : splitProduct.length === 5 &&
+//       (obj = {
+//         id: x,
+//         image_url: imgURL,
+//         name_product: splitProduct[0],
+//         price_product: splitProduct[2],
+//         name_seller: splitProduct[4],
+//         seller_type: getLabel,
+//         seller_location: splitProduct[3],
+//         star_product: "-",
+//         sold_product: "-",
+//       });
+
+//   result.result.push(obj);
+// }
+// fs.writeFile("output.json", JSON.stringify(result), "utf8", function (err) {
+//   if (err) {
+//     console.log("An error occured while writing JSON Object to File.");
+//     return console.log(err);
+//   }
+
+//   console.log("JSON file has been saved.");
+// });
+// console.log(result.result);
