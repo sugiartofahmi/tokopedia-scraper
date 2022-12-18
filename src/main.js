@@ -9,9 +9,6 @@ const browser = await app.connect({
   browserWSEndpoint: wsChromeEndpointurl,
 });
 const page = await browser.newPage();
-const limit = process.env.PAGES;
+await Tokopedia(page, process.env.PAGES);
 
-for (let pages = 1; pages <= limit; pages++) {
-  await Tokopedia(page, pages);
-}
-// await page.close();
+await page.close();
