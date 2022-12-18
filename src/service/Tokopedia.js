@@ -3,18 +3,6 @@ import { AutoScroll } from "../utils/AutoScroll.js";
 config();
 import fs from "fs";
 export const Tokopedia = async (page, pages) => {
-  const unused = [
-    "Terlaris",
-    "Funstation",
-    "Tambah Giftcard!",
-    "Cashback",
-    "Produk Terbaru",
-    "MED Harbolnas",
-    "Serbu OS",
-    "Diskon Pengguna Baru",
-    "Ad",
-    "Brand Pilihan",
-  ];
   const result = [];
   let obj = {};
 
@@ -78,74 +66,82 @@ export const Tokopedia = async (page, pages) => {
         : label === "imgSRPProdTabShopBadge" && "Dilayani Tokopedia";
 
     const splitProduct = await getProduct.split("\n");
-    if (unused.includes(splitProduct[0])) {
-      splitProduct.splice(0, 1);
-    }
-    if (unused.includes(splitProduct[1])) {
-      splitProduct.splice(1, 1);
-    }
-    if (unused.includes(splitProduct[2])) {
-      splitProduct.splice(2, 1);
-    }
-    if (unused.includes(splitProduct[3])) {
-      splitProduct.splice(3, 1);
-    }
-    if (unused.includes(splitProduct[4])) {
-      splitProduct.splice(4, 1);
-    }
-    if (splitProduct[2].endsWith("%")) {
-      splitProduct.splice(2, 2);
-    }
-    if (splitProduct[1].startsWith("Rp") && splitProduct[1].endsWith("pcs")) {
-      splitProduct.splice(1, 1);
-    }
-    if (splitProduct[0].startsWith("Sisa")) {
-      splitProduct.splice(0, 1);
-    }
+    splitProduct.map((x, i) =>
+      x.includes("Funstation")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Cepat & Irit!")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Tambah Giftcard!")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Produk Terbaru")
+        ? splitProduct.splice(i, 1)
+        : x.includes("MED Harbolnas")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Serbu OS")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Diskon Pengguna Baru")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Grosir")
+        ? splitProduct.splice(i, 1)
+        : x.length < 9 && x.includes("Terlaris")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Cashback")
+        ? splitProduct.splice(i, 1)
+        : x.includes("Brand Pilihan")
+        ? splitProduct.splice(i, 1)
+        : x.endsWith("%")
+        ? splitProduct.splice(i, 1)
+        : x.startsWith("Sisa")
+        ? splitProduct.splice(i, 1)
+        : x.startsWith("Rp") && x.endsWith("pcs") && splitProduct.splice(i, 1)
+    );
+    splitProduct[2].startsWith("Rp") && splitProduct.splice(2, 1);
+    // console.log(splitProduct);
+    // console.log(splitProduct.length);
 
-    splitProduct.length === 6
-      ? (obj = {
-          id: i,
-          image_url: getImage,
-          name_product: splitProduct[0],
-          price_product: splitProduct[1],
-          name_seller: splitProduct[3],
-          seller_type: getLabel,
-          seller_location: splitProduct[2],
-          star_product: splitProduct[4],
-          sold_product: splitProduct[5],
-          page: pages,
-        })
-      : splitProduct.length === 5
-      ? (obj = {
-          id: i,
-          image_url: getImage,
-          name_product: splitProduct[0],
-          price_product: splitProduct[1],
-          name_seller: splitProduct[3],
-          seller_type: getLabel,
-          seller_location: splitProduct[2],
-          star_product: "-",
-          sold_product: splitProduct[5],
-          page: pages,
-        })
-      : splitProduct.length === 4 &&
-        (obj = {
-          id: i,
-          image_url: getImage,
-          name_product: splitProduct[0],
-          price_product: splitProduct[1],
-          name_seller: splitProduct[3],
-          seller_type: getLabel,
-          seller_location: splitProduct[2],
-          star_product: "-",
-          sold_product: "-",
-          page: pages,
-        });
+    // splitProduct.length === 6
+    //   ? (obj = {
+    //       id: i * pages,
+    //       image_url: getImage,
+    //       name_product: splitProduct[0],
+    //       price_product: splitProduct[1],
+    //       name_seller: splitProduct[3],
+    //       seller_type: getLabel,
+    //       seller_location: splitProduct[2],
+    //       star_product: splitProduct[4],
+    //       sold_product: splitProduct[5],
+    //       page: pages,
+    //     })
+    //   : splitProduct.length === 5
+    //   ? (obj = {
+    //       id: i * pages,
+    //       image_url: getImage,
+    //       name_product: splitProduct[0],
+    //       price_product: splitProduct[1],
+    //       name_seller: splitProduct[3],
+    //       seller_type: getLabel,
+    //       seller_location: splitProduct[2],
+    //       star_product: "-",
+    //       sold_product: splitProduct[5],
+    //       page: pages,
+    //     })
+    //   : splitProduct.length === 4 &&
+    //     (obj = {
+    //       id: i * pages,
+    //       image_url: getImage,
+    //       name_product: splitProduct[0],
+    //       price_product: splitProduct[1],
+    //       name_seller: splitProduct[3],
+    //       seller_type: getLabel,
+    //       seller_location: splitProduct[2],
+    //       star_product: "-",
+    //       sold_product: "-",
+    //       page: pages,
+    //     });
 
-    result.push(obj);
+    // result.push(obj);
   }
-  console.log(result);
+  // console.log(result);
   // await page.close();
 };
 

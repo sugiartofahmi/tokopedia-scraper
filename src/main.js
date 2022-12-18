@@ -14,3 +14,4 @@ const limit = process.env.PAGES;
 for (let pages = 1; pages <= limit; pages++) {
   await Tokopedia(page, pages);
 }
+// await page.close();
