@@ -32,7 +32,7 @@ export const Tokopedia = async (page, pages) => {
         (e) => e.innerHTML
       )
     );
-    // console.log(getAllCard.length);
+
     for (
       let i = 1, row = 1, data = 6, pic = 7;
       i <= getAllCard.length - 10;
@@ -50,12 +50,17 @@ export const Tokopedia = async (page, pages) => {
         `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${row}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-1f2quy8 > a > div > img`,
         (img) => img.src
       );
+      const getUrl = await page.$eval(
+        `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${row}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-1f2quy8 > a`,
+        (a) => a.getAttribute("href")
+      );
       const label = await page.$eval(
         `#zeus-root > div > div.css-jau1bt > div > div.css-rjanld > div:nth-child(4) > div:nth-child(${row}) > div:nth-child(${pic}) > div > div > div > div > div > div.css-974ipl > a > div.css-yaxhi2 > div.css-1ktbh56 > i`,
         (i) => i.getAttribute("data-testid")
       );
       const getProduct = await page.evaluate((el) => el.innerText, product[0]);
       const getImage = img.replace("200", "500");
+
       const getLabel =
         label === "imgSRPProdTabShopBadgeOSNonTopAds"
           ? "Official Store"
@@ -96,12 +101,13 @@ export const Tokopedia = async (page, pages) => {
           : x.startsWith("Rp") && x.endsWith("pcs") && splitProduct.splice(i, 1)
       );
       splitProduct[2].startsWith("Rp") && splitProduct.splice(2, 1);
-      // console.log(splitProduct);
+      // console.log(getUrl);
       // console.log(splitProduct.length);
 
       splitProduct.length === 6
         ? (obj = {
             id: i,
+            product_url: getUrl,
             image_url: getImage,
             name_product: splitProduct[0],
             price_product: splitProduct[1],
@@ -115,6 +121,7 @@ export const Tokopedia = async (page, pages) => {
         : splitProduct.length === 5
         ? (obj = {
             id: i,
+            product_url: getUrl,
             image_url: getImage,
             name_product: splitProduct[0],
             price_product: splitProduct[1],
@@ -128,6 +135,7 @@ export const Tokopedia = async (page, pages) => {
         : splitProduct.length === 4 &&
           (obj = {
             id: i,
+            product_url: getUrl,
             image_url: getImage,
             name_product: splitProduct[0],
             price_product: splitProduct[1],
@@ -141,7 +149,7 @@ export const Tokopedia = async (page, pages) => {
 
       result.push(obj);
     }
-    console.log(result);
+    // console.log(result);
 
     fs.writeFile("output.json", JSON.stringify(result), "utf8", function (err) {
       if (err) {
